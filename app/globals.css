@@ -2564,68 +2564,318 @@ aside small {
   .screen { padding-bottom: 6px; }
 }
 
+/* =============================================================================
+   REBUILD — line-as-data + conversational Today
+   The fake status bar (9:41 / dynamic island / 5G / battery) is gone: this runs
+   as a home-screen app in the iOS Simulator, where the real one sits on top.
+   Its 41px of reserved height is replaced by the actual safe-area inset, so the
+   wash reaches under the notch instead of stopping short of a fake one.
+   ============================================================================= */
 
+.phone {
+  padding-top: max(10px, env(safe-area-inset-top));
+}
 
-/* --- device chrome (phase 3) --------------------------------------------
-   The in-app status bar. Removed in the rebuild because that runs as a
-   Home Screen app where iOS draws the real one on top. */
-.status {
-  height: 41px;
-  padding: 0 26px;
+@media (max-width:850px) {
+  .phone { padding-top: env(safe-area-inset-top); }
+}
+
+/* --- Today: one conversation, no step machine ---------------------------- */
+.today,
+.threads-view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Choosing a concern is choosing a line -- the one place the line art is the
+   control rather than the illustration. Six identical capsules became six
+   distinguishable shapes. */
+.picker {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 12px 24px 18px;
+}
+
+.picker::-webkit-scrollbar { display: none; }
+.picker h1 { margin-bottom: 8px; }
+.picker .bodycopy { margin-bottom: 18px; }
+
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.picker-row {
+  height: 64px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 19px;
+  background: rgba(255,255,255,.05);
+  color: var(--ink);
+  display: grid;
+  grid-template-columns: 118px 1fr 22px;
+  align-items: center;
+  gap: 12px;
+  padding-right: 15px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+}
+
+.picker-row:hover {
+  background: rgba(255,255,255,.11);
+  border-color: rgba(255,255,255,.46);
+}
+
+.picker-line {
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  display: block;
+  mask-image: linear-gradient(90deg, #000 72%, transparent);
+}
+
+.picker-line canvas { width: 100% !important; height: 100% !important; }
+.picker-row b { font-size: 15px; font-weight: 500; }
+.picker-row em { font-style: normal; color: var(--faint); display: flex; }
+.picker-row em .material-symbols-rounded { font-size: 19px; }
+
+/* --- the thread's own line, live above the conversation ------------------ */
+.thread-head {
+  flex: 0 0 auto;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,.13);
+}
+
+.thread-line-wrap {
+  height: clamp(112px, 17vh, 168px);
+  position: relative;
+  overflow: hidden;
+}
+
+.thread-line-wrap canvas { width: 100% !important; height: 100% !important; }
+
+.thread-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 24px 9px;
+}
+
+.thread-meta span {
+  font-size: var(--text-micro);
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: #edff3f;
+}
+
+.thread-meta b { font-size: var(--text-micro); font-weight: 500; color: var(--label); }
+
+/* --- the conversation: an editorial column, not chat bubbles ------------- */
+.convo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: 18px 24px 6px;
+  scroll-behavior: smooth;
+}
+
+.convo::-webkit-scrollbar { display: none; }
+
+.turn {
+  margin: 0 0 15px;
+  animation: turn-in .42s cubic-bezier(.22,1,.36,1) both;
+}
+
+/* Oomi speaks in the display face with no bubble and no avatar. */
+.turn.oomi {
+  font-size: 19px;
+  line-height: 1.28;
+  letter-spacing: -.4px;
+  font-weight: 430;
+  color: var(--ink);
+  max-width: 19em;
+}
+
+/* Your replies sit quieter and indented -- a margin note, not a counterpart. */
+.turn.you {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--faint);
+  padding-left: 15px;
+  border-left: 1px solid var(--line);
+  max-width: 24em;
+}
+
+.turn.noticing-turn { display: flex; gap: 10px; align-items: flex-start; }
+
+.noticing-dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: #edff3f;
+  box-shadow: 0 0 11px rgba(237,255,63,.55);
+}
+
+@keyframes turn-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* --- composer: the only place a pill appears, capped at three ------------ */
+.composer {
+  flex: 0 0 auto;
+  padding: 8px 24px max(14px, env(safe-area-inset-bottom));
+  background: linear-gradient(transparent, rgba(11,40,29,.34) 34%);
+}
+
+.suggests {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 9px;
+}
+
+.suggests::-webkit-scrollbar { display: none; }
+
+.suggests button {
+  flex: 0 0 auto;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(255,255,255,.26);
+  border-radius: 17px;
+  background: rgba(255,255,255,.07);
+  color: var(--ink);
+  font-size: var(--text-label);
+  white-space: nowrap;
+  cursor: pointer;
+  animation: turn-in .42s cubic-bezier(.22,1,.36,1) both;
+}
+
+.suggests button:hover { background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.5); }
+
+.composer form {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: 8px;
+  align-items: center;
+}
+
+.composer input {
+  height: 48px;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 24px;
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(14px);
+  color: var(--ink);
+  padding: 0 17px;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.composer input::placeholder { color: rgba(255,255,255,.46); }
+.composer input:focus { border-color: #edff3f; }
+
+.composer form button {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(248,250,237,.92);
+  color: #183b2c;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.composer form button:disabled { opacity: .3; cursor: default; }
+.composer form button .material-symbols-rounded { font-size: 21px; }
+
+.composer-foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 11px;
-  font-weight: 600;
+  margin-top: 9px;
 }
 
-.island {
-  position: absolute;
-  left: 50%;
-  top: 8px;
-  transform: translateX(-50%);
-  width: 105px;
-  height: 27px;
-  border-radius: 18px;
-  background: #08110f;
+.composer-foot small { font-size: var(--text-micro); color: var(--label); letter-spacing: .3px; }
+
+.ghost {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #edff3f;
+  font-size: var(--text-label);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
 }
 
-.status-right { display: flex; align-items: center; gap: 5px; }
+.ghost .material-symbols-rounded { font-size: 15px; }
 
-.battery {
-  position: relative;
-  width: 22px;
-  height: 11px;
-  border: 1px solid rgba(248,250,237,.5);
-  border-radius: 3.5px;
-  padding: 1.5px;
-}
+/* --- Threads: signatures at a glance ------------------------------------ */
+.threads-view { overflow-y: auto; scrollbar-width: none; }
+.threads-view::-webkit-scrollbar { display: none; }
 
-.battery:after {
-  content: "";
-  position: absolute;
-  left: 100%;
-  top: 50%;
-  width: 1.5px;
-  height: 4px;
-  margin-left: 1.5px;
-  border-radius: 0 1.5px 1.5px 0;
-  background: rgba(248,250,237,.5);
-  transform: translateY(-50%);
-}
-
-.battery i {
+.thread-card {
   display: block;
-  width: 78%;
-  height: 100%;
-  border-radius: 1.5px;
-  background: var(--ink);
+  width: calc(100% - 44px);
+  margin: 0 22px 10px;
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 21px;
+  background: rgba(255,255,255,.05);
+  color: var(--ink);
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
 }
 
-.phone small,
-.phone .kicker,
-.phone .visual-label,
-.phone .between-label,
-.phone .appbar small {
-  line-height: 1.3;
+.thread-card.is-active { border-color: rgba(237,255,63,.5); }
+.thread-card:hover { background: rgba(255,255,255,.1); }
+
+.card-line {
+  display: block;
+  height: 84px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-line canvas { width: 100% !important; height: 100% !important; }
+
+.thread-card > div { padding: 10px 16px 14px; }
+.thread-card small { display: block; font-size: var(--text-micro); letter-spacing: 1.1px; color: #edff3f; }
+.thread-card.is-active small { color: #edff3f; }
+.thread-card b { display: block; font-size: 17px; font-weight: 500; margin: 3px 0 2px; }
+.thread-card span { font-size: var(--text-label); color: var(--label); }
+
+@media (max-height:730px) {
+  .turn.oomi { font-size: 17px; }
+  .convo { padding-top: 13px; }
+  .picker-row { height: 56px; }
+}
+
+/* Tailwind preflight resets headings to `font-size: inherit`, and the old size
+   rules were all scoped to `.screen h1` -- which the rebuilt surfaces don't use.
+   Give the new surfaces the display face explicitly. */
+.picker h1 {
+  font: 430 33px/1.03 "Instrument Sans", Arial, Helvetica, sans-serif;
+  font-variation-settings: "wdth" 86;
+  letter-spacing: -1.5px;
+  margin: 0 0 8px;
+  max-width: 320px;
+}
+
+@media (max-height:730px) {
+  .picker h1 { font-size: 28px; }
 }

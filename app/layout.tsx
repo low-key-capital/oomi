@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,7 +7,25 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
+  // Added to the Home Screen from the iOS Simulator, so it runs standalone with
+  // the real status bar drawn over the page. `black-translucent` lets the wash
+  // reach under the notch; the safe-area insets in globals.css keep content clear
+  // of it. This is also why the fake 9:41 / dynamic island / battery were removed.
+  appleWebApp: {
+    capable: true,
+    title: "Oomi",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // Required for env(safe-area-inset-*) to resolve to anything but 0.
+  viewportFit: "cover",
+  themeColor: "#112b22",
 };
 
 export default function RootLayout({
