@@ -25,22 +25,31 @@ interface ExecutionContext {
 // dangerouslyAllowSVG: true in next.config.js and uncomment below:
 // const imageConfig: ImageConfig = { dangerouslyAllowSVG: true };
 
+// Unlisted prototype: keep every response out of search indexes. This is the
+// most robust of the three layers (robots.txt + a meta tag are the others),
+// because it also covers non-HTML responses and crawlers that skip robots.txt.
+const noIndex = (response: Response): Response => {
+  const out = new Response(response.body, response);
+  out.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive, nosnippet");
+  return out;
+};
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
-      return handleImageOptimization(request, {
+      return noIndex(await handleImageOptimization(request, {
         fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
           const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
           return result.response();
         },
-      }, allowedWidths);
+      }, allowedWidths));
     }
 
-    return handler.fetch(request, env, ctx);
+    return noIndex(await handler.fetch(request, env, ctx));
   },
 };
 

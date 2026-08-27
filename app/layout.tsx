@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Unlisted prototype -- the repo is public so preview links can be shared,
+  // but nothing here should turn up in search results.
+  robots: { index: false, follow: false, nocache: true },
   title: "Oomi — Your private health story",
   description: "A calm, sovereignty-first health companion that helps you notice what matters.",
   icons: {
